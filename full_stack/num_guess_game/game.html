@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Number Guessing Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e3f2fd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .game-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #1565c0;
+    }
+
+    #feedback {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Guess the Number (1-100)</h1>
+    <input type="number" id="guessInput" placeholder="Enter your guess" min="1" max="100" />
+    <br>
+    <button onclick="checkGuess()">Submit</button>
+    <p id="feedback"></p>
+  </div>
+
+  <script>
+    let randomNumber = Math.floor(Math.random() * 100) + 1;
+
+    function checkGuess() {
+      const guess = parseInt(document.getElementById('guessInput').value);
+      const feedback = document.getElementById('feedback');
+
+      if (isNaN(guess) || guess < 1 || guess > 100) {
+        feedback.textContent = 'Please enter a number between 1 and 100.';
+        feedback.style.color = 'orange';
+        return;
+      }
+
+      if (guess > randomNumber) {
+        feedback.textContent = 'Too High!';
+        feedback.style.color = 'red';
+      } else if (guess < randomNumber) {
+        feedback.textContent = 'Too Low!';
+        feedback.style.color = 'blue';
+      } else {
+        feedback.textContent = 'Correct! 🎉';
+        feedback.style.color = 'green';
+        setTimeout(() => {
+          alert('Starting a new game!');
+          randomNumber = Math.floor(Math.random() * 100) + 1;
+          document.getElementById('guessInput').value = '';
+          feedback.textContent = '';
+        }, 1000);
+      }
+    }
+  </script>
+</body>
+</html>

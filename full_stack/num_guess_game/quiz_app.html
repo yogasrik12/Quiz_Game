@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .timer {
+      text-align: right;
+      font-size: 16px;
+      color: #d32f2f;
+      margin-bottom: 15px;
+    }
+    .question {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #222;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #e0e0e0;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .options button:hover {
+      background: #ccc;
+    }
+    .options button.correct {
+      background: #4caf50;
+      color: #fff;
+    }
+    .options button.incorrect {
+      background: #f44336;
+      color: #fff;
+    }
+    #scoreDisplay, #highScore {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+    #startBtn {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Quiz App</h1>
+  <div class="timer" id="timer">Time Left: 60s</div>
+  <div class="question" id="question">Click Start to begin the quiz!</div>
+  <div class="options" id="options"></div>
+  <div id="scoreDisplay"></div>
+  <div id="highScore">High Score: 0</div>
+  <button id="startBtn">Start Quiz</button>
+</div>
+
+<script>
+  const quizData = [
+    {
+      question: "Which language runs in a web browser?",
+      options: ["Java", "C", "Python", "JavaScript"],
+      correct: "JavaScript"
+    },
+    {
+      question: "What does CSS stand for?",
+      options: ["Central Style Sheets", "Cascading Style Sheets", "Computer Style Sheet", "Colorful Style Sheet"],
+      correct: "Cascading Style Sheets"
+    },
+    {
+      question: "Which HTML tag is used for a line break?",
+      options: ["<p>", "<br>", "<div>", "<line>"],
+      correct: "<br>"
+    },
+    {
+      question: "What does DOM stand for?",
+      options: ["Document Object Model", "Data Object Model", "Desktop Oriented Mode", "None"],
+      correct: "Document Object Model"
+    }
+  ];
+
+  let currentQuestion = 0, score = 0, timer, timeLeft = 60;
+  const questionEl = document.getElementById("question");
+  const optionsEl = document.getElementById("options");
+  const timerEl = document.getElementById("timer");
+  const scoreEl = document.getElementById("scoreDisplay");
+  const highScoreEl = document.getElementById("highScore");
+  const startBtn = document.getElementById("startBtn");
+
+  const highScore = localStorage.getItem("quizHighScore") || 0;
+  highScoreEl.textContent = "High Score: " + highScore;
+
+  startBtn.addEventListener("click", () => {
+    startBtn.style.display = "none";
+    score = 0;
+    currentQuestion = 0;
+    timeLeft = 60;
+    scoreEl.textContent = "";
+    loadQuestion();
+    startTimer();
+  });
+
+  function loadQuestion() {
+    if (currentQuestion >= quizData.length) return endQuiz();
+    const current = quizData[currentQuestion];
+    questionEl.textContent = current.question;
+    optionsEl.innerHTML = "";
+    current.options.forEach(option => {
+      const btn = document.createElement("button");
+      btn.textContent = option;
+      btn.onclick = () => checkAnswer(btn, option);
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(button, selected) {
+    const correctAnswer = quizData[currentQuestion].correct;
+    const allButtons = optionsEl.querySelectorAll("button");
+    allButtons.forEach(btn => {
+      btn.disabled = true;
+      if (btn.textContent === correctAnswer) btn.classList.add("correct");
+      else if (btn.textContent === selected) btn.classList.add("incorrect");
+    });
+    if (selected === correctAnswer) score++;
+    setTimeout(() => {
+      currentQuestion++;
+      loadQuestion();
+    }, 1000);
+  }
+
+  function startTimer() {
+    timer = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = `Time Left: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        endQuiz();
+      }
+    }, 1000);
+  }
+
+  function endQuiz() {
+    clearInterval(timer);
+    questionEl.textContent = "Quiz Completed!";
+    optionsEl.innerHTML = "";
+    scoreEl.textContent = `Your Score: ${score}/${quizData.length}`;
+    if (score > highScore) {
+      localStorage.setItem("quizHighScore", score);
+      highScoreEl.textContent = "High Score: " + score;
+    }
+    startBtn.textContent = "Restart Quiz";
+    startBtn.style.display = "block";
+  }
+</script>
+</body>
+</html>
